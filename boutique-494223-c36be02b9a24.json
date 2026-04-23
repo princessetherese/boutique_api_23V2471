@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "boutique-494223",
+  "private_key_id": "c36be02b9a2454e51def6aeed327682f33fdc1f8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZZBWKH5WmPBTy\nb3q799yTPzlVHAD1Y1OvHkY7ZFe0fcCpctMhz/3rohWdoajXLUXNIznar7n9J4u4\nz3zxg1eT+ZVSUAgFL/Y3kTGPMWHdPhbIaaiFj846qnUSL9OsHSq9oy9ADQw9m4h+\nWKiDqqI+8jquHDrA6ytVDUtcsTsJElB4U2q5h3U842ZLNj5KrDQ4GnZ/hb6wON/p\nQ8VRHfT5z7SnPdCqfakDJ08z+VyBjYJ8HEiYUyV46l44YwgrDVuFbrrPNTX72X88\n+JQtx7D6mUwKo1VvBvUMkJIcUI9mixukn5IcHNdno8ln3SyTewWscUqSvyKuiFWj\n4SmmkCudAgMBAAECggEALV5RDXiufVkkIP1pfqGJj9RdxXiY7Z1bWVxm2V3FXQZy\nhxqO3AthiYPT4Ygbqb6JxvhPSmeql93hL8Jjp66awCfSBTHtHpIGH04mquTqMOdU\nj2JXmHos1rr8wD0pfo2+vgF4qrQeZhwXxhCAKKxbfGoGm5AKJfleW3txCyj0sl1U\nqzAV6b/1VDtmrJ3VPdiB3Wp5rl0iTYEjz8+DvuUML6UrrNTzr4iMwl3y4hrAgl6O\nK0tBVW1L1XQD44NNHj7tm6YBtqn2Yt6xp6CSMj4hICAYEXvHJx8XfgongyupBlw/\nWsacZEs/LqbWI21nGAFYymP8czMoaYmrEWuh8NPV0QKBgQD8bML19L+jct5/GL/u\nQp98XuU+Oth7F4pYJhLfWcGU1wbbjvrPgICg846fgbIIBBN9Jr7SJWXQZ99katM+\n67QlNYdZtJzuh5X6kYTmwXK0ST/K3oZAwYjn+aKQ7YKw7C6hJEELY0nMUJrDsb4H\nBNfHSn/q9EVC22IXHRTc0PULrQKBgQDceEwTWUHar4QVag1ZYcx6C7Dyt9aCTRkZ\np5rm9cAXCD3Wsbn5upfa0+FEWPZVd0GzNISOTieZSUDkyHP3GCnDF5rgEtaDTjqW\n9IKhkIsva8c/1D5sRX62oXaVSTrKS7Z9gU94RPZVxzq4brXF6MWCZYDZPqRVDAsk\n+KHjuCKdsQKBgQDKAcQYDzDZ/hBfCBB4/Soi3tJ4daFPCKy3FGkgAvVvRpF/XbIM\nIxtNMvydW658yb5K9pnZFQKgwK++7dp2TSySZn8V4/t+zFTS/GeuP3urGb+Ke4BX\nDEqi0l0tvFVNfwVmAdxn36JsdskT+QdJGLASFeW+wpM3CNg8BRLwD+061QKBgQCl\nPgTG+79ACQ0Wf8ZBl+uKDfkx8lf0kZSeheCz+r1ehe7TW6HoatImUWglsgfvRtMX\nXeV8Q1eqrBzXXOaN7K5gavDJwVTGVXvUaK8AKTYo9L8CODIRNIUknSAkBB7sQJMm\nviSyH/4BjLGWSmQzUaO3eBx6t1iz5bL0ouWzp+9KAQKBgBB3TWjqEvIUq2XnQb1f\n9o/J/FjWCejGXdAs2TAMaNBOp7GJPMBSeCycWJmEFifjs+xtEzDPX/1it8UUYy5A\n0O4BNuWAWhYTlUGeBwvdFOPzI16Mq4uTm+7wvqD65amozTbeNEcJxMsK2G6PpKQi\nDnrNCH0U7DDrwr6lxg8OOVNr\n-----END PRIVATE KEY-----\n",
+  "client_email": "streamlit-api@boutique-494223.iam.gserviceaccount.com",
+  "client_id": "109565399321646689736",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streamlit-api%40boutique-494223.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
