@@ -1,4 +1,4 @@
-# app_supabase_corrige.py - Version avec corrections
+# app_supabase_final.py - Version avec 40 produits et modification des commandes
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -54,11 +54,10 @@ def charger_clients():
         return pd.DataFrame()
 
 def sauvegarder_client(client):
-    """Sauvegarde un nouveau client dans Supabase - Version corrigée"""
+    """Sauvegarde un nouveau client dans Supabase"""
     if supabase is None:
         return None
     try:
-        # Convertir toutes les valeurs pour JSON
         client_clean = {k: convertir_pour_json(v) for k, v in client.items()}
         response = supabase.table("clients").insert(client_clean).execute()
         return response.data[0] if response.data else None
@@ -67,11 +66,10 @@ def sauvegarder_client(client):
         return None
 
 def mettre_a_jour_client(client_id, data):
-    """Met à jour un client existant - Version corrigée"""
+    """Met à jour un client existant"""
     if supabase is None:
         return False
     try:
-        # Convertir toutes les valeurs pour JSON
         data_clean = {k: convertir_pour_json(v) for k, v in data.items()}
         supabase.table("clients").update(data_clean).eq("client_id", client_id).execute()
         return True
@@ -93,11 +91,10 @@ def charger_achats():
         return pd.DataFrame()
 
 def sauvegarder_achat(achat):
-    """Sauvegarde un nouvel achat dans Supabase - Version corrigée"""
+    """Sauvegarde un nouvel achat dans Supabase"""
     if supabase is None:
         return None
     try:
-        # Convertir toutes les valeurs pour JSON
         achat_clean = {k: convertir_pour_json(v) for k, v in achat.items()}
         response = supabase.table("achats").insert(achat_clean).execute()
         return response.data[0] if response.data else None
@@ -106,11 +103,10 @@ def sauvegarder_achat(achat):
         return None
 
 def mettre_a_jour_achat(order_id, data):
-    """Met à jour un achat existant - Version corrigée"""
+    """Met à jour un achat existant"""
     if supabase is None:
         return False
     try:
-        # Convertir toutes les valeurs pour JSON
         data_clean = {k: convertir_pour_json(v) for k, v in data.items()}
         supabase.table("achats").update(data_clean).eq("order_id", order_id).execute()
         return True
@@ -139,18 +135,55 @@ if 'df_achats' not in st.session_state:
 if 'edit_order_id' not in st.session_state:
     st.session_state.edit_order_id = None
 
-# ==================== CATALOGUE PRODUITS ====================
+# ==================== CATALOGUE PRODUITS - 10 PRODUITS PAR CATÉGORIE ====================
 PRODUITS = {
-    '📱 Smartphone Tecno': {'prix': 120000, 'categorie': 'Électronique', 'desc': '128Go'},
-    '📱 iPhone 13': {'prix': 450000, 'categorie': 'Électronique', 'desc': 'Apple'},
-    '💻 PC Portable HP': {'prix': 350000, 'categorie': 'Électronique', 'desc': 'Core i5'},
-    '🎧 Casque JBL': {'prix': 30000, 'categorie': 'Électronique', 'desc': 'Bluetooth'},
-    '👕 T-shirt Premium': {'prix': 7500, 'categorie': 'Mode', 'desc': 'Coton bio'},
-    '👖 Jean Slim': {'prix': 15000, 'categorie': 'Mode', 'desc': 'Slim'},
-    '👟 Basket Nike': {'prix': 55000, 'categorie': 'Mode', 'desc': 'Air'},
-    '🛋️ Canapé': {'prix': 250000, 'categorie': 'Maison', 'desc': 'Cuir'},
-    '⚽ Ballon foot': {'prix': 8000, 'categorie': 'Sports', 'desc': 'Taille 5'},
-    '🚴 Vélo': {'prix': 150000, 'categorie': 'Sports', 'desc': '21 vitesses'}
+    # ÉLECTRONIQUE (10 produits)
+    '📱 Smartphone Tecno Camon 20 Pro': {'prix': 150000, 'categorie': 'Électronique', 'desc': '8Go RAM, 128Go stockage'},
+    '📱 iPhone 14 Pro Max': {'prix': 850000, 'categorie': 'Électronique', 'desc': 'Apple A16, 256Go'},
+    '📱 Samsung Galaxy S23 Ultra': {'prix': 750000, 'categorie': 'Électronique', 'desc': '12Go RAM, 256Go'},
+    '📱 Xiaomi Redmi Note 12': {'prix': 180000, 'categorie': 'Électronique', 'desc': '6Go RAM, 128Go'},
+    '💻 PC Portable HP Pavilion': {'prix': 450000, 'categorie': 'Électronique', 'desc': 'Core i7, 16Go RAM'},
+    '💻 PC Dell XPS 13': {'prix': 800000, 'categorie': 'Électronique', 'desc': 'Core i9, 32Go RAM'},
+    '💻 PC Lenovo ThinkPad': {'prix': 550000, 'categorie': 'Électronique', 'desc': 'Core i5, 8Go RAM'},
+    '🎧 Casque Sony WH-1000XM5': {'prix': 120000, 'categorie': 'Électronique', 'desc': 'Réduction de bruit'},
+    '⌚ Apple Watch Series 8': {'prix': 250000, 'categorie': 'Électronique', 'desc': 'GPS + Cellular'},
+    '🔊 Enceinte JBL Charge 5': {'prix': 85000, 'categorie': 'Électronique', 'desc': 'Bluetooth, 20W'},
+    
+    # MODE (10 produits)
+    '👕 T-shirt Lacoste Homme': {'prix': 25000, 'categorie': 'Mode', 'desc': '100% coton, taille S-XXL'},
+    '👕 Chemise Hugo Boss': {'prix': 65000, 'categorie': 'Mode', 'desc': 'Luxe, coupe slim'},
+    '👖 Jean Levi\'s 501': {'prix': 45000, 'categorie': 'Mode', 'desc': 'Jean brut original'},
+    '👗 Robe Zara Collection': {'prix': 35000, 'categorie': 'Mode', 'desc': 'Soirée, longue'},
+    '👟 Basket Nike Air Max': {'prix': 85000, 'categorie': 'Mode', 'desc': 'Confort, style sport'},
+    '👟 Basket Adidas Ultraboost': {'prix': 95000, 'categorie': 'Mode', 'desc': 'Running léger'},
+    '🧥 Manteau Ralph Lauren': {'prix': 120000, 'categorie': 'Mode', 'desc': 'Hiver, doudoune'},
+    '🧣 Écharpe Burberry': {'prix': 55000, 'categorie': 'Mode', 'desc': 'Cachemire luxe'},
+    '👔 Costume Armani': {'prix': 250000, 'categorie': 'Mode', 'desc': 'Tailleur 3 pièces'},
+    '🕶️ Lunettes Ray-Ban': {'prix': 75000, 'categorie': 'Mode', 'desc': 'Solaire, classique'},
+    
+    # MAISON (10 produits)
+    '🛋️ Canapé convertible 3 places': {'prix': 350000, 'categorie': 'Maison', 'desc': 'Cuir, noir'},
+    '🛏️ Lit King Size': {'prix': 280000, 'categorie': 'Maison', 'desc': 'Avec sommier et matelas'},
+    '🚪 Armoire 5 portes': {'prix': 250000, 'categorie': 'Maison', 'desc': 'Chêne massif'},
+    '🍽️ Table à manger extensible': {'prix': 180000, 'categorie': 'Maison', 'desc': '6-8 places, bois'},
+    '💡 Lampe sur pied design': {'prix': 45000, 'categorie': 'Maison', 'desc': 'LED, moderne'},
+    '🪑 Lot de 6 chaises': {'prix': 120000, 'categorie': 'Maison', 'desc': 'Moderne, confortables'},
+    '📺 Téléviseur Samsung 65"': {'prix': 500000, 'categorie': 'Maison', 'desc': '4K Ultra HD Smart TV'},
+    '❄️ Réfrigérateur Samsung': {'prix': 400000, 'categorie': 'Maison', 'desc': '520L, No Frost'},
+    '🧺 Machine à laver LG': {'prix': 300000, 'categorie': 'Maison', 'desc': '9kg, Silencieuse'},
+    '🍳 Four micro-ondes Samsung': {'prix': 85000, 'categorie': 'Maison', 'desc': 'Grill, 25L'},
+    
+    # SPORTS (10 produits)
+    '⚽ Ballon de football officiel': {'prix': 15000, 'categorie': 'Sports', 'desc': 'Taille 5, FIFA Quality'},
+    '🏀 Ballon de basketball NBA': {'prix': 20000, 'categorie': 'Sports', 'desc': 'Taille 7, cuir synthétique'},
+    '🎾 Raquette de tennis Babolat': {'prix': 65000, 'categorie': 'Sports', 'desc': 'Pro, carbone'},
+    '🏋️ Set haltères 20kg': {'prix': 45000, 'categorie': 'Sports', 'desc': 'Avec barre, 2 haltères'},
+    '🚴 Vélo de route Triban': {'prix': 250000, 'categorie': 'Sports', 'desc': '21 vitesses, alu'},
+    '🏃 Tapis de course électrique': {'prix': 350000, 'categorie': 'Sports', 'desc': 'Moteur 2.5HP, pliable'},
+    '🥊 Gants de boxe Everlast': {'prix': 28000, 'categorie': 'Sports', 'desc': 'Cuir, 14oz'},
+    '🏊 Lunettes de natation Speedo': {'prix': 12000, 'categorie': 'Sports', 'desc': 'Anti-buée, UV'},
+    '🧘 Tapis de yoga premium': {'prix': 18000, 'categorie': 'Sports', 'desc': 'Anti-dérapant, 10mm'},
+    '⚽ Maillot PSG domicile': {'prix': 35000, 'categorie': 'Sports', 'desc': 'Officiel, Messi #30'}
 }
 
 def format_fcfa(x):
@@ -268,6 +301,10 @@ st.markdown("""
         border-radius: 15px;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
     }
     .mobile-money-card {
         background: linear-gradient(135deg, #FF6600 0%, #FF8533 100%);
@@ -282,6 +319,11 @@ st.markdown("""
         padding: 0.8rem;
         margin: 0.5rem 0;
         border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    .product-card:hover {
+        border-color: #FF6600;
+        box-shadow: 0 4px 12px rgba(255,102,0,0.15);
     }
     .footer {
         text-align: center;
@@ -289,6 +331,14 @@ st.markdown("""
         margin-top: 2rem;
         border-top: 1px solid #e9ecef;
         color: #6c757d;
+    }
+    .order-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border-left: 4px solid #667eea;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -302,6 +352,7 @@ st.markdown("""
         <span style="background:#FF6600; padding:0.2rem 0.8rem; border-radius:20px;">📱 Mobile Money</span>
         <span style="background:#2196F3; padding:0.2rem 0.8rem; border-radius:20px;">✏️ Modification</span>
         <span style="background:#dc3545; padding:0.2rem 0.8rem; border-radius:20px;">🗑️ Suppression</span>
+        <span style="background:#28a745; padding:0.2rem 0.8rem; border-radius:20px;">🎁 40 Produits</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -331,10 +382,12 @@ with st.sidebar:
     st.markdown("""
     <div class="mobile-money-card">
         📱 <strong>Mobile Money</strong><br>
-        <small>Paiement instantané</small>
+        <small>Paiement instantané<br>MTN, Orange, Camtel</small>
     </div>
     """, unsafe_allow_html=True)
     
+    st.markdown("---")
+    st.success(f"🎁 **{len(PRODUITS)} produits** disponibles dans 4 catégories")
     st.markdown("---")
     st.caption("© 2024 ShopAnalyzer Pro by Armelle")
 
@@ -348,6 +401,7 @@ menu = st.sidebar.radio(
 # ==================== PAGE 1: NOUVEL ACHAT ====================
 if menu == "🛒 Nouvel Achat":
     st.markdown("## 🛒 **Nouvelle commande**")
+    st.caption(f"📦 **{len(PRODUITS)} produits** disponibles - Choisissez vos articles ci-dessous")
     
     with st.form("achat_form", clear_on_submit=True):
         col1, col2 = st.columns([1, 1.5])
@@ -387,18 +441,26 @@ if menu == "🛒 Nouvel Achat":
             produits_selectionnes = []
             montant_total = 0
             
-            for categorie in ['Électronique', 'Mode', 'Maison', 'Sports']:
+            # Affichage des 4 catégories avec les 10 produits chacune
+            categories = ['Électronique', 'Mode', 'Maison', 'Sports']
+            for categorie in categories:
                 produits_cat = [(nom, info) for nom, info in PRODUITS.items() if info['categorie'] == categorie]
-                with st.expander(f"📂 {categorie}"):
-                    for produit, info in produits_cat:
-                        col_qty, col_price = st.columns([1, 1])
-                        with col_qty:
-                            quantite = st.number_input(f"{produit}", min_value=0, max_value=10, key=produit, label_visibility="collapsed")
-                        with col_price:
-                            st.markdown(f"<span style='color:#FF6600;'>{format_fcfa(info['prix'])}</span>", unsafe_allow_html=True)
-                        if quantite > 0:
-                            produits_selectionnes.extend([produit] * quantite)
-                            montant_total += info['prix'] * quantite
+                with st.expander(f"📂 {categorie} - {len(produits_cat)} produits", expanded=(categorie == 'Électronique')):
+                    # Affichage en 2 colonnes pour mieux utiliser l'espace
+                    cols = st.columns(2)
+                    for i, (produit, info) in enumerate(produits_cat):
+                        with cols[i % 2]:
+                            st.markdown(f"""
+                            <div class="product-card">
+                                <strong>{produit}</strong><br>
+                                <small style="color:#666;">{info['desc']}</small><br>
+                                <span style="color:#FF6600; font-weight:bold;">{format_fcfa(info['prix'])}</span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            quantite = st.number_input("Qté", min_value=0, max_value=10, key=f"{categorie}_{produit}", label_visibility="collapsed")
+                            if quantite > 0:
+                                produits_selectionnes.extend([produit] * quantite)
+                                montant_total += info['prix'] * quantite
             
             st.markdown("---")
             st.markdown("### 💳 **Mode de paiement**")
@@ -406,10 +468,9 @@ if menu == "🛒 Nouvel Achat":
             mode_paiement = st.radio(
                 "Choisissez votre moyen de paiement",
                 ["💳 Carte bancaire", "🚚 Livraison", "📱 Mobile Money (MTN/Orange/Camtel)"],
-                index=2  # Mobile Money sélectionné par défaut
+                index=2
             )
             
-            # Le numéro de téléphone n'apparaît que si Mobile Money est sélectionné
             phone_number = None
             if "Mobile Money" in mode_paiement:
                 phone_number = st.text_input("📱 Numéro de téléphone Mobile Money", 
@@ -436,7 +497,7 @@ if menu == "🛒 Nouvel Achat":
             elif "Mobile Money" in mode_paiement and not phone_number:
                 st.error("❌ Veuillez saisir votre numéro de téléphone pour le paiement Mobile Money")
             else:
-                with st.spinner("Traitement..."):
+                with st.spinner("Traitement en cours..."):
                     time.sleep(0.5)
                     
                     if option_client == "✨ Nouveau client":
@@ -463,6 +524,7 @@ if menu == "🛒 Nouvel Achat":
                     order_id = enregistrer_achat(client_id, client_nom, produits_selectionnes, montant_total, mode_paiement, phone_number)
                     st.balloons()
                     st.success(f"🎉 Commande #{order_id} confirmée !")
+                    st.info("💡 Vous pouvez modifier ou supprimer cette commande dans l'onglet 'Mes Commandes'")
 
 # ==================== PAGE 2: DASHBOARD ====================
 elif menu == "📊 Dashboard":
@@ -519,7 +581,7 @@ elif menu == "📊 Dashboard":
             fig = px.line(ventes_par_jour, x='date', y='montant_fcfa', title="📈 Évolution des ventes")
             st.plotly_chart(fig, use_container_width=True)
 
-# ==================== PAGE 3: MES COMMANDES ====================
+# ==================== PAGE 3: MES COMMANDES (AVEC MODIFICATION) ====================
 elif menu == "📋 Mes Commandes":
     st.markdown("## 📋 **Mes commandes**")
     
@@ -539,11 +601,24 @@ elif menu == "📋 Mes Commandes":
             for _, commande in commandes_client.iterrows():
                 with st.container():
                     st.markdown(f"""
-                    <div style='background: white; border-radius: 12px; padding: 1rem; margin: 0.5rem 0; border-left: 4px solid #667eea;'>
-                        <strong>📦 Commande #{int(commande['order_id'])}</strong> - {commande['date']}<br>
-                        <strong>Produits:</strong> {commande['produits']}<br>
-                        <strong>Total:</strong> {format_fcfa(commande['montant_fcfa'])}<br>
-                        <strong>Paiement:</strong> {commande['mode_paiement']}
+                    <div class="order-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>📦 Commande #{int(commande['order_id'])}</strong>
+                                <span style="margin-left: 1rem; font-size: 0.8rem;">{commande['date']}</span>
+                            </div>
+                            <span style="background: {'#28a745' if commande['statut'] == 'Confirmé' else '#ffc107'}; 
+                                         color: {'white' if commande['statut'] == 'Confirmé' else 'black'}; 
+                                         padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.7rem;">
+                                {commande['statut']}
+                            </span>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <strong>Produits:</strong> {commande['produits']}<br>
+                            <strong>Articles:</strong> {int(commande['nb_articles'])}<br>
+                            <strong>Total:</strong> {format_fcfa(commande['montant_fcfa'])}<br>
+                            <strong>Paiement:</strong> {commande['mode_paiement']}
+                        </div>
                     </div>
                     """, unsafe_allow_html=True)
                     
@@ -558,6 +633,7 @@ elif menu == "📋 Mes Commandes":
                                 st.success("✅ Commande supprimée !")
                                 st.rerun()
         
+        # Formulaire de modification
         if st.session_state.edit_order_id is not None:
             st.markdown("---")
             st.markdown("## ✏️ **Modifier ma commande**")
@@ -568,32 +644,45 @@ elif menu == "📋 Mes Commandes":
                 produits_actuels = commande['produits'].split(', ') if commande['produits'] else []
                 
                 with st.form("edit_form"):
+                    st.subheader("📦 Modifier les produits")
+                    
                     produits_modifies = []
                     nouveau_montant = 0
                     
                     for categorie in ['Électronique', 'Mode', 'Maison', 'Sports']:
                         produits_cat = [(nom, info) for nom, info in PRODUITS.items() if info['categorie'] == categorie]
                         with st.expander(f"📂 {categorie}"):
-                            for produit, info in produits_cat:
-                                quantite_defaut = produits_actuels.count(produit) if produit in produits_actuels else 0
-                                quantite = st.number_input(
-                                    f"{produit} - {format_fcfa(info['prix'])}",
-                                    min_value=0, max_value=10, value=quantite_defaut,
-                                    key=f"edit_{produit}"
-                                )
-                                if quantite > 0:
-                                    produits_modifies.extend([produit] * quantite)
-                                    nouveau_montant += info['prix'] * quantite
+                            cols = st.columns(2)
+                            for i, (produit, info) in enumerate(produits_cat):
+                                with cols[i % 2]:
+                                    quantite_defaut = produits_actuels.count(produit) if produit in produits_actuels else 0
+                                    quantite = st.number_input(
+                                        f"{produit} - {format_fcfa(info['prix'])}",
+                                        min_value=0, max_value=10, value=quantite_defaut,
+                                        key=f"edit_{categorie}_{produit}"
+                                    )
+                                    if quantite > 0:
+                                        produits_modifies.extend([produit] * quantite)
+                                        nouveau_montant += info['prix'] * quantite
+                    
+                    st.markdown(f"""
+                    <div style='background: #2196F3; padding: 1rem; border-radius: 15px; text-align: center; margin-top: 1rem;'>
+                        <div style='color: white;'>💰 NOUVEAU TOTAL</div>
+                        <div style='font-size: 1.5rem; font-weight: bold; color: white;'>{format_fcfa(nouveau_montant)}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.form_submit_button("💾 Enregistrer"):
+                        if st.form_submit_button("💾 Enregistrer les modifications", use_container_width=True):
                             if modifier_commande(st.session_state.edit_order_id, produits_modifies, nouveau_montant):
-                                st.success("✅ Commande modifiée !")
+                                st.success(f"✅ Commande #{st.session_state.edit_order_id} modifiée !")
                                 st.session_state.edit_order_id = None
                                 st.rerun()
+                            else:
+                                st.error("❌ Erreur lors de la modification")
                     with col2:
-                        if st.form_submit_button("❌ Annuler"):
+                        if st.form_submit_button("❌ Annuler", use_container_width=True):
                             st.session_state.edit_order_id = None
                             st.rerun()
 
@@ -607,12 +696,18 @@ else:
         df_display = st.session_state.df_clients.copy()
         df_display['revenu_annuel_fcfa'] = df_display['revenu_annuel_fcfa'].apply(format_fcfa)
         df_display['ca_total_fcfa'] = df_display['ca_total_fcfa'].apply(format_fcfa)
-        st.dataframe(df_display, use_container_width=True)
+        st.dataframe(df_display[['client_id', 'nom', 'email', 'âge', 'ville', 'revenu_annuel_fcfa', 
+                                 'ca_total_fcfa', 'nb_achats', 'dernier_achat']], use_container_width=True)
+        
+        # Export CSV
+        csv_clients = st.session_state.df_clients.to_csv(index=False)
+        st.download_button("📥 Exporter la liste des clients (CSV)", csv_clients, "clients.csv", "text/csv")
 
 # ==================== FOOTER ====================
 st.markdown("""
 <div class="footer">
     <p>🛍️ <strong>ShopAnalyzer Pro</strong> - Réalisé par <strong>Armelle</strong></p>
-    <p>💰 Francs CFA | 📱 Mobile Money | ✏️ Modifier/Supprimer</p>
+    <p>💰 Francs CFA | 📱 Mobile Money | ✏️ Modifier/Supprimer | 🎁 40 produits disponibles</p>
+    <p>📦 Électronique • Mode • Maison • Sports — 10 produits par catégorie</p>
 </div>
 """, unsafe_allow_html=True)
