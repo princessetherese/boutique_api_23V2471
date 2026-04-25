@@ -1,4 +1,4 @@
-# app_supabase.py - Version avec base de données en ligne
+# app_supabase_corrige.py - Version avec corrections
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -23,7 +23,23 @@ def init_supabase():
 
 supabase = init_supabase()
 
-# ==================== FONCTIONS BASE DE DONNÉES ====================
+# ==================== FONCTION DE CONVERSION POUR JSON ====================
+def convertir_pour_json(valeur):
+    """Convertit les types numpy en types Python standards pour JSON"""
+    if isinstance(valeur, (np.int64, np.int32)):
+        return int(valeur)
+    elif isinstance(valeur, (np.float64, np.float32)):
+        return float(valeur)
+    elif isinstance(valeur, np.ndarray):
+        return valeur.tolist()
+    elif hasattr(valeur, 'item'):
+        return valeur.item()
+    elif pd.isna(valeur):
+        return None
+    else:
+        return valeur
+
+# ==================== FONCTIONS BASE DE DONNÉES CORRIGÉES ====================
 def charger_clients():
     """Charge les clients depuis Supabase"""
     if supabase is None:
@@ -38,22 +54,26 @@ def charger_clients():
         return pd.DataFrame()
 
 def sauvegarder_client(client):
-    """Sauvegarde un nouveau client dans Supabase"""
+    """Sauvegarde un nouveau client dans Supabase - Version corrigée"""
     if supabase is None:
         return None
     try:
-        response = supabase.table("clients").insert(client).execute()
+        # Convertir toutes les valeurs pour JSON
+        client_clean = {k: convertir_pour_json(v) for k, v in client.items()}
+        response = supabase.table("clients").insert(client_clean).execute()
         return response.data[0] if response.data else None
     except Exception as e:
         st.error(f"Erreur sauvegarde client : {e}")
         return None
 
 def mettre_a_jour_client(client_id, data):
-    """Met à jour un client existant"""
+    """Met à jour un client existant - Version corrigée"""
     if supabase is None:
         return False
     try:
-        supabase.table("clients").update(data).eq("client_id", client_id).execute()
+        # Convertir toutes les valeurs pour JSON
+        data_clean = {k: convertir_pour_json(v) for k, v in data.items()}
+        supabase.table("clients").update(data_clean).eq("client_id", client_id).execute()
         return True
     except Exception as e:
         st.error(f"Erreur mise à jour client : {e}")
@@ -73,22 +93,26 @@ def charger_achats():
         return pd.DataFrame()
 
 def sauvegarder_achat(achat):
-    """Sauvegarde un nouvel achat dans Supabase"""
+    """Sauvegarde un nouvel achat dans Supabase - Version corrigée"""
     if supabase is None:
         return None
     try:
-        response = supabase.table("achats").insert(achat).execute()
+        # Convertir toutes les valeurs pour JSON
+        achat_clean = {k: convertir_pour_json(v) for k, v in achat.items()}
+        response = supabase.table("achats").insert(achat_clean).execute()
         return response.data[0] if response.data else None
     except Exception as e:
         st.error(f"Erreur sauvegarde achat : {e}")
         return None
 
 def mettre_a_jour_achat(order_id, data):
-    """Met à jour un achat existant"""
+    """Met à jour un achat existant - Version corrigée"""
     if supabase is None:
         return False
     try:
-        supabase.table("achats").update(data).eq("order_id", order_id).execute()
+        # Convertir toutes les valeurs pour JSON
+        data_clean = {k: convertir_pour_json(v) for k, v in data.items()}
+        supabase.table("achats").update(data_clean).eq("order_id", order_id).execute()
         return True
     except Exception as e:
         st.error(f"Erreur mise à jour achat : {e}")
@@ -136,15 +160,18 @@ def format_fcfa(x):
 
 def enregistrer_achat(client_id, client_nom, produits_achetes, montant_total, mode_paiement, phone_number=None):
     """Enregistre un nouvel achat dans Supabase"""
-    order_id = len(st.session_state.df_achats) + 1 if len(st.session_state.df_achats) > 0 else 1
+    if len(st.session_state.df_achats) == 0:
+        order_id = 1
+    else:
+        order_id = int(st.session_state.df_achats['order_id'].max()) + 1
     
     nouvel_achat = {
         'order_id': order_id,
         'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'client_id': client_id,
+        'client_id': int(client_id),
         'client_nom': client_nom,
         'produits': ', '.join(produits_achetes),
-        'montant_fcfa': montant_total,
+        'montant_fcfa': int(montant_total),
         'mode_paiement': mode_paiement,
         'nb_articles': len(produits_achetes),
         'telephone': phone_number if phone_number else '',
@@ -158,8 +185,8 @@ def enregistrer_achat(client_id, client_nom, produits_achetes, montant_total, mo
         # Mettre à jour le CA du client
         idx = st.session_state.df_clients[st.session_state.df_clients['client_id'] == client_id].index
         if len(idx) > 0:
-            nouveau_ca = st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] + montant_total
-            nouveau_nb = st.session_state.df_clients.loc[idx[0], 'nb_achats'] + 1
+            nouveau_ca = int(st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] + montant_total)
+            nouveau_nb = int(st.session_state.df_clients.loc[idx[0], 'nb_achats'] + 1)
             mettre_a_jour_client(client_id, {
                 'ca_total_fcfa': nouveau_ca,
                 'nb_achats': nouveau_nb,
@@ -175,12 +202,12 @@ def modifier_commande(order_id, nouveaux_produits, nouveau_montant):
     if len(commande) == 0:
         return False
     
-    ancien_montant = commande.iloc[0]['montant_fcfa']
-    client_id = commande.iloc[0]['client_id']
+    ancien_montant = int(commande.iloc[0]['montant_fcfa'])
+    client_id = int(commande.iloc[0]['client_id'])
     
     mise_a_jour = {
         'produits': ', '.join(nouveaux_produits),
-        'montant_fcfa': nouveau_montant,
+        'montant_fcfa': int(nouveau_montant),
         'nb_articles': len(nouveaux_produits),
         'statut': 'Modifié'
     }
@@ -191,7 +218,7 @@ def modifier_commande(order_id, nouveaux_produits, nouveau_montant):
         # Mettre à jour le CA du client
         idx = st.session_state.df_clients[st.session_state.df_clients['client_id'] == client_id].index
         if len(idx) > 0:
-            nouveau_ca = st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] + (nouveau_montant - ancien_montant)
+            nouveau_ca = int(st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] + (nouveau_montant - ancien_montant))
             mettre_a_jour_client(client_id, {'ca_total_fcfa': nouveau_ca})
             st.session_state.df_clients = charger_clients()
         
@@ -204,8 +231,8 @@ def supprimer_commande(order_id):
     if len(commande) == 0:
         return False
     
-    client_id = commande.iloc[0]['client_id']
-    montant = commande.iloc[0]['montant_fcfa']
+    client_id = int(commande.iloc[0]['client_id'])
+    montant = int(commande.iloc[0]['montant_fcfa'])
     
     if supprimer_achat(order_id):
         st.session_state.df_achats = charger_achats()
@@ -213,8 +240,8 @@ def supprimer_commande(order_id):
         # Mettre à jour le CA du client
         idx = st.session_state.df_clients[st.session_state.df_clients['client_id'] == client_id].index
         if len(idx) > 0:
-            nouveau_ca = st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] - montant
-            nouveau_nb = st.session_state.df_clients.loc[idx[0], 'nb_achats'] - 1
+            nouveau_ca = int(st.session_state.df_clients.loc[idx[0], 'ca_total_fcfa'] - montant)
+            nouveau_nb = int(st.session_state.df_clients.loc[idx[0], 'nb_achats'] - 1)
             mettre_a_jour_client(client_id, {
                 'ca_total_fcfa': nouveau_ca,
                 'nb_achats': nouveau_nb
@@ -378,12 +405,18 @@ if menu == "🛒 Nouvel Achat":
             
             mode_paiement = st.radio(
                 "Choisissez votre moyen de paiement",
-                ["📱 Mobile Money (MTN/Orange/Camtel)", "💳 Carte bancaire", "🚚 Livraison"]
+                ["💳 Carte bancaire", "🚚 Livraison", "📱 Mobile Money (MTN/Orange/Camtel)"],
+                index=2  # Mobile Money sélectionné par défaut
             )
             
+            # Le numéro de téléphone n'apparaît que si Mobile Money est sélectionné
             phone_number = None
             if "Mobile Money" in mode_paiement:
-                phone_number = st.text_input("Numéro de téléphone", placeholder="6X XX XX XX XX")
+                phone_number = st.text_input("📱 Numéro de téléphone Mobile Money", 
+                                            placeholder="6X XX XX XX XX",
+                                            help="Obligatoire pour le paiement Mobile Money")
+                if phone_number:
+                    st.success(f"✅ Paiement avec Mobile Money au {phone_number}")
             
             st.markdown(f"""
             <div style='background: linear-gradient(135deg, #FF6600 0%, #FF8533 100%); 
@@ -400,6 +433,8 @@ if menu == "🛒 Nouvel Achat":
                 st.error("❌ Sélectionnez au moins un produit")
             elif option_client == "✨ Nouveau client" and (not client_nom or not email):
                 st.error("❌ Remplissez vos informations")
+            elif "Mobile Money" in mode_paiement and not phone_number:
+                st.error("❌ Veuillez saisir votre numéro de téléphone pour le paiement Mobile Money")
             else:
                 with st.spinner("Traitement..."):
                     time.sleep(0.5)
@@ -408,10 +443,10 @@ if menu == "🛒 Nouvel Achat":
                         nouveau_client = {
                             'nom': client_nom,
                             'email': email,
-                            'age': age,
+                            'age': int(age),
                             'ville': ville,
                             'avatar': avatar,
-                            'revenu_annuel_fcfa': revenu_client,
+                            'revenu_annuel_fcfa': int(revenu_client),
                             'ca_total_fcfa': 0,
                             'nb_achats': 0,
                             'dernier_achat': ''
@@ -424,8 +459,6 @@ if menu == "🛒 Nouvel Achat":
                         else:
                             st.error("❌ Erreur création compte")
                             st.stop()
-                    else:
-                        client_id = client_id
                     
                     order_id = enregistrer_achat(client_id, client_nom, produits_selectionnes, montant_total, mode_paiement, phone_number)
                     st.balloons()
@@ -532,7 +565,7 @@ elif menu == "📋 Mes Commandes":
             commande_to_edit = st.session_state.df_achats[st.session_state.df_achats['order_id'] == st.session_state.edit_order_id]
             if len(commande_to_edit) > 0:
                 commande = commande_to_edit.iloc[0]
-                produits_actuels = commande['produits'].split(', ')
+                produits_actuels = commande['produits'].split(', ') if commande['produits'] else []
                 
                 with st.form("edit_form"):
                     produits_modifies = []
@@ -583,4 +616,3 @@ st.markdown("""
     <p>💰 Francs CFA | 📱 Mobile Money | ✏️ Modifier/Supprimer</p>
 </div>
 """, unsafe_allow_html=True)
-    
